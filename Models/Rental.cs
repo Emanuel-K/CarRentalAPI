@@ -13,7 +13,14 @@ namespace CarRentalAPI.Models
         
         [Required]
         public int CarId { get; set; }
+        [BsonIgnore]
+        public string CarMake { get; set; }  
 
+        [BsonIgnore]
+        public string CarModel { get; set; }  
+
+        [BsonIgnore]
+        public int CarYear { get; set; }
         [Required]
         public string CustomerName { get; set; }
 
