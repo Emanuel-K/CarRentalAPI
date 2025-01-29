@@ -56,3 +56,31 @@ namespace CarRentalAPI.Services{
             var update = Builders<Car>.Update.Set(c => c.IsAvailable, false);
             await _cars.UpdateOneAsync(x => x.Id == rental.CarId, update);
             await _rentals.InsertOneAsync(rental);}
+        public async Task UpdateAsync(int id, Rental updatedRental){
+            var existingRental = await GetAsync(id);
+            if (existingRental == null){
+                throw new InvalidOperationException("Rental not found");}
+            if (updatedRental.CarId != existingRental.CarId){
+                var newCar = await _cars.Find(x => x.Id == updatedRental.CarId).FirstOrDefaultAsync();
+                if (newCar == null){
+                    throw new InvalidOperationException("New car not found");}
+
+                if (!newCar.IsAvailable){
+                    throw new InvalidOperationException("New car is not available for rental");}
+                var updateOldCar = Builders<Car>.Update.Set(c => c.IsAvailable, true);
+                await _cars.UpdateOneAsync(x => x.Id == existingRental.CarId, updateOldCar);
+                var updateNewCar = Builders<Car>.Update.Set(c => c.IsAvailable, false);
+                await _cars.UpdateOneAsync(x => x.Id == updatedRental.CarId, updateNewCar);
+            }
+            updatedRental.Id = id;
+            await _rentals.ReplaceOneAsync(x => x.Id == id, updatedRental);}
+
+        public async Task DeleteAsync(int id)
+        {
+            var rental = await GetAsync(id);
+            if (rental != null){
+                var update = Builders<Car>.Update.Set(c => c.IsAvailable, true);
+                await _cars.UpdateOneAsync(x => x.Id == rental.CarId, update);
+                await _rentals.DeleteOneAsync(x => x.Id == id);}
+        }
+}}
