@@ -8,5 +8,5 @@ namespace CarRentalAPI.Services{
         Task DeleteAsync(int id);
         Task<List<Rental>> SearchRentalsAsync(string searchTerm);
   }}
-using CarRentalAPI.Models;
+
 
