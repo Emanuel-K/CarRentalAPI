@@ -66,6 +66,11 @@ namespace CarRentalAPI.Controllers
             var cars = await _carService.SearchCarsAsync(searchTerm);
             return Ok(cars);
         }
-        
+        [HttpGet("filter-by-year")]
+        public async Task<ActionResult<List<Car>>> FilterByYear(int startYear, int endYear)
+        {
+            var cars = await _carService.FilterByYearAsync(startYear, endYear);
+            return Ok(cars);
+        }
     }
 }
