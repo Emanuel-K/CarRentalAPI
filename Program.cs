@@ -43,3 +43,18 @@ app.UseHttpsRedirection();
 app.UseCors("AllowAll");
 app.UseAuthorization();
 app.MapControllers();
+app.UseExceptionHandler("/error");
+app.Map("/error", (HttpContext context) =>
+{
+    var exception = context.Features.Get<Microsoft.AspNetCore.Diagnostics.IExceptionHandlerFeature>()?.Error;
+    return Results.Problem(
+        title: exception?.Message,
+        statusCode: exception switch
+        {
+            InvalidOperationException => StatusCodes.Status400BadRequest,
+            _ => StatusCodes.Status500InternalServerError
+        }
+    );
+});
+
+app.Run();
