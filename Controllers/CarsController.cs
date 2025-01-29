@@ -38,8 +38,6 @@ namespace CarRentalAPI.Controllers
             await _carService.CreateAsync(car);
             return CreatedAtAction(nameof(Get), new { id = car.Id }, car);
         }
-
-        // PUT: api/cars/{id}
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, [FromBody] Car updatedCar)
         {
@@ -50,6 +48,23 @@ namespace CarRentalAPI.Controllers
             }
             await _carService.UpdateAsync(id, updatedCar);
             return NoContent();
+        }
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var car = await _carService.GetAsync(id);
+            if (car == null)
+            {
+                return NotFound();
+            }
+            await _carService.DeleteAsync(id);
+            return NoContent();
+        }
+        [HttpGet("search/{searchTerm}")]
+        public async Task<ActionResult<List<Car>>> Search(string searchTerm)
+        {
+            var cars = await _carService.SearchCarsAsync(searchTerm);
+            return Ok(cars);
         }
         
     }
