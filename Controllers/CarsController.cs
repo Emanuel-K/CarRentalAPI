@@ -32,7 +32,25 @@ namespace CarRentalAPI.Controllers
             }
             return Ok(car);
         }
+        [HttpPost]
+        public async Task<ActionResult<Car>> Create([FromBody] Car car)
+        {
+            await _carService.CreateAsync(car);
+            return CreatedAtAction(nameof(Get), new { id = car.Id }, car);
+        }
 
+        // PUT: api/cars/{id}
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(int id, [FromBody] Car updatedCar)
+        {
+            var existingCar = await _carService.GetAsync(id);
+            if (existingCar == null)
+            {
+                return NotFound();
+            }
+            await _carService.UpdateAsync(id, updatedCar);
+            return NoContent();
+        }
         
     }
 }
