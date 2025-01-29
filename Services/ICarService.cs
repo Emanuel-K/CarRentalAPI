@@ -4,12 +4,12 @@ namespace CarRentalAPI.Services
 {
     public interface ICarService
     {
-        List<Car> Get();
-        Car Get(int id);
-        void Create(Car car);
-        void Update(int id, Car car);
-        void Delete(int id);
-        List<Car> SearchCars(string searchTerm);
-        List<Car> FilterByYear(int startYear, int endYear);
+        Task<List<Car>> GetAsync();
+        Task<Car> GetAsync(int id);
+        Task CreateAsync(Car car);
+        Task UpdateAsync(int id, Car car);
+        Task DeleteAsync(int id);
+        Task<List<Car>> SearchCarsAsync(string searchTerm);
+         Task<List<Car>> FilterByYearAsync(int startYear, int endYear);
     }
 }
