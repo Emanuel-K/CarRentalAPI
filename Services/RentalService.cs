@@ -83,4 +83,20 @@ namespace CarRentalAPI.Services{
                 await _cars.UpdateOneAsync(x => x.Id == rental.CarId, update);
                 await _rentals.DeleteOneAsync(x => x.Id == id);}
         }
+        public async Task<List<Rental>> SearchRentalsAsync(string searchTerm){
+            searchTerm = searchTerm.ToLower();
+            var rentals = await _rentals.Find(_ => true).ToListAsync();
+            foreach (var rental in rentals){
+                var car = await _cars.Find(x => x.Id == rental.CarId).FirstOrDefaultAsync();
+                if (car != null){
+                    rental.CarMake = car.Make;
+                    rental.CarModel = car.Model;
+                    rental.CarYear = car.Year;}
+            }
+            var filteredRentals = rentals.Where(r => 
+                r.CarMake.ToLower().Equals(searchTerm) || 
+                r.CarModel.ToLower().Equals(searchTerm)
+            ).ToList();
+            return filteredRentals;
+        }
 }}
