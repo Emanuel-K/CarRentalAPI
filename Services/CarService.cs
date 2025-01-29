@@ -7,32 +7,48 @@ namespace CarRentalAPI.Services
     public class CarService : ICarService
     {
         private readonly IMongoCollection<Car> _cars;
-        public CarService(IOptions<MongoDBSettings> mongoDBSettings){
+        public CarService(IOptions<MongoDBSettings> mongoDBSettings)
+        {
             var mongoClient = new MongoClient(mongoDBSettings.Value.ConnectionString);
             var mongoDatabase = mongoClient.GetDatabase(mongoDBSettings.Value.DatabaseName);
-            _cars = mongoDatabase.GetCollection<Car>("Cars");}
-        public List<Car> Get(){
-            return _cars.Find(_ => true).ToList();}
-        public Car Get(int id){
-            return _cars.Find(x => x.Id == id).FirstOrDefault();}
-        public void Create(Car car){
-            _cars.InsertOne(car);}
-        public void Update(int id, Car updatedCar){
+            _cars = mongoDatabase.GetCollection<Car>("Cars");
+        }
+        public async Task<List<Car>> GetAsync()
+        {
+            return await _cars.Find(_ => true).ToListAsync();
+        }
+        public async Task<Car> GetAsync(int id)
+        {
+            return await _cars.Find(x => x.Id == id).FirstOrDefaultAsync();
+        }
+        public async Task CreateAsync(Car car)
+        {
+            await _cars.InsertOneAsync(car);
+        }
+        public async Task UpdateAsync(int id, Car updatedCar)
+        {
             updatedCar.Id = id;
-            _cars.ReplaceOne(x => x.Id == id, updatedCar);}
-        public void Delete(int id){
-            _cars.DeleteOne(x => x.Id == id);}
-        public List<Car> SearchCars(string searchTerm){
+            await _cars.ReplaceOneAsync(x => x.Id == id, updatedCar);
+        }
+        public async Task DeleteAsync(int id)
+        {
+            await _cars.DeleteOneAsync(x => x.Id == id);
+        }
+        public async Task<List<Car>> SearchCarsAsync(string searchTerm)
+        {
             var filter = Builders<Car>.Filter.Or(
                 Builders<Car>.Filter.Eq(x => x.Make, searchTerm),
                 Builders<Car>.Filter.Eq(x => x.Model, searchTerm)
             );
-            return _cars.Find(filter).ToList();}
-        public List<Car> FilterByYear(int startYear, int endYear){ 
+            return await _cars.Find(filter).ToListAsync();
+        }
+        public async Task<List<Car>> FilterByYearAsync(int startYear, int endYear)
+        {
             var yearFilter = Builders<Car>.Filter.And(
                 Builders<Car>.Filter.Gte(x => x.Year, startYear),
                 Builders<Car>.Filter.Lte(x => x.Year, endYear)
             );
-            return _cars.Find(yearFilter).ToList();}
+            return await _cars.Find(yearFilter).ToListAsync();
+        }
     }
 }
