@@ -8,7 +8,7 @@ namespace CarRentalAPI.Models
     {
         [BsonId]
         
-        public string Id { get; set; }
+        public int Id { get; set; }
 
         
         [Required]
