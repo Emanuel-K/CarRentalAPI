@@ -1,6 +1,7 @@
 using CarRentalAPI.Models;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
+using System.Text.RegularExpressions;
 
 namespace CarRentalAPI.Services
 {
@@ -34,12 +35,16 @@ namespace CarRentalAPI.Services
         {
             await _cars.DeleteOneAsync(x => x.Id == id);
         }
-        public async Task<List<Car>> SearchCarsAsync(string searchTerm)
+         public async Task<List<Car>> SearchCarsAsync(string searchTerm)
         {
+            // Case-insensitive regex for exact match
+            var regex = new Regex($"^{searchTerm}$", RegexOptions.IgnoreCase);
+
             var filter = Builders<Car>.Filter.Or(
-                Builders<Car>.Filter.Eq(x => x.Make, searchTerm),
-                Builders<Car>.Filter.Eq(x => x.Model, searchTerm)
+                Builders<Car>.Filter.Regex(x => x.Make, regex),
+                Builders<Car>.Filter.Regex(x => x.Model, regex)
             );
+
             return await _cars.Find(filter).ToListAsync();
         }
         public async Task<List<Car>> FilterByYearAsync(int startYear, int endYear)
